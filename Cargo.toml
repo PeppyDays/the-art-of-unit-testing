@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.37"
+mockall = "0.12.1"
 rstest = "0.18.2"
