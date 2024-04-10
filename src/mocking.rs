@@ -1,3 +1,4 @@
+use fake::Dummy;
 use mockall::automock;
 
 #[automock]
@@ -25,9 +26,17 @@ fn call_bar_with_four(x: &dyn MyTrait) -> u32 {
     x.bar(4, 4)
 }
 
+#[derive(Debug)]
+struct PostMedia {
+    name: String,
+    no: u32,
+}
+
 #[cfg(test)]
 mod tests {
+    use fake::{faker::name::en::Name, Fake, Faker};
     use mockall::predicate;
+    use rstest::{fixture, rstest};
 
     use super::*;
 
@@ -36,6 +45,21 @@ mod tests {
         impl ThirdTrait for ThirdTrait {
             fn foo(&self, x: u32) -> u32;
         }
+    }
+
+    impl Dummy<Faker> for PostMedia {
+        fn dummy_with_rng<R: rand::prelude::Rng + ?Sized>(_: &Faker, rng: &mut R) -> Self {
+            Self {
+                name: Name().fake(),
+                no: Faker.fake_with_rng(rng),
+            }
+        }
+    }
+
+    #[rstest]
+    #[case(Faker.fake::<PostMedia>())]
+    fn stub_data_is_generated_automatically(#[case] command: PostMedia) {
+        dbg!(command);
     }
 
     #[test]
